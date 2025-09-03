@@ -12,21 +12,22 @@ ENV DEBIAN_FRONTEND=noninteractive \
  && update-ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
-
-# TeX: tylko wymagane pakiety
-RUN tlmgr update --self && tlmgr install \
-      latexmk koma-script xcolor float geometry setspace \
-      amsmath amsfonts hyperref bookmark caption \
-      mdframed tcolorbox fvextra upquote listings \
-      pgf pgfplots csquotes \
-      fontspec tex-gyre dejavu \
-      titlesec sectsty enumitem wrapfig \
-      background pagecolor draftwatermark \
-      footmisc footnotebackref \
-      babel-polish colortbl pdfcol \
-      siunitx l3kernel l3packages l3backend \
-      makecell tocloft titling zref needspace \
- && mktexlsr
+ RUN set -eux; \
+  tlmgr option repository https://sunsite.icm.edu.pl/pub/CTAN/systems/texlive/tlnet; \
+  tlmgr update --self --no-persistent-downloads; \
+  tlmgr install --no-persistent-downloads \
+    latexmk koma-script xcolor float geometry setspace \
+    amsmath amsfonts hyperref bookmark caption \
+    mdframed tcolorbox fvextra upquote listings \
+    pgf pgfplots csquotes \
+    fontspec tex-gyre dejavu \
+    titlesec sectsty enumitem wrapfig \
+    background pagecolor draftwatermark \
+    footmisc footnotebackref \
+    babel-polish colortbl pdfcol \
+    siunitx l3kernel l3packages l3backend \
+    makecell tocloft titling zref needspace; \
+  mktexlsr
 
 # === VENDOR: pliki TeX ===
 RUN install -d /opt/texlive/texmf-local/tex/latex/local \
