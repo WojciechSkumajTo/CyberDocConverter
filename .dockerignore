@@ -1,0 +1,12 @@
+.git
+__pycache__
+*.py[cod]
+.env
+*.pdf
+*.aux
+*.log
+*.out
+*.toc
+node_modules
+Dockerfile
+.dockerignore
