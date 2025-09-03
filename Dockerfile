@@ -2,12 +2,16 @@ FROM pandoc/latex:3.7.0.2-ubuntu
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt \
+    PIP_CERT=/etc/ssl/certs/ca-certificates.crt
 
-# Python
-RUN apt-get update && apt-get install -y --no-install-recommends \
+
+    RUN apt-get update && apt-get install -y --no-install-recommends \
       python3 python3-venv python3-pip ca-certificates \
+ && update-ca-certificates \
  && rm -rf /var/lib/apt/lists/*
+
 
 # TeX: tylko wymagane pakiety
 RUN tlmgr update --self && tlmgr install \
