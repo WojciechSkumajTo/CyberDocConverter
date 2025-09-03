@@ -1,0 +1,506 @@
+$passoptions.latex()$
+\documentclass[
+$for(babel-otherlangs)$
+  $babel-otherlangs$,
+$endfor$
+$if(babel-lang)$
+  $babel-lang$,
+$endif$
+$if(fontsize)$
+  $fontsize$,
+$endif$
+$if(papersize)$
+  $papersize$paper,
+$else$
+  paper=a4,
+$endif$
+$for(classoption)$
+  $classoption$$sep$,
+$endfor$
+  ,captions=tableheading
+]{$if(book)$scrbook$else$scrartcl$endif$}
+
+$if(beamerarticle)$
+\usepackage{beamerarticle}
+$endif$
+
+% --- pakiety wymagane przez okładkę i panel metadanych ---
+\usepackage[table]{xcolor}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{tikzfill}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{pgfplots}
+\usepackage[utf8]{inputenc}
+\usepackage[headsepline,footsepline,plainheadsepline,plainfootsepline]{scrlayer-scrpage}
+
+
+% centrowanie wszystkich figure
+\let\origfigure\figure
+\let\endorigfigure\endfigure
+\renewenvironment{figure}[1][htbp]{\origfigure[#1]\centering}{\endorigfigure}
+
+\usepackage{tikz}
+\usepackage{tabularx}
+\usepackage[most]{tcolorbox}
+
+% --- Severity boxes ---
+\tcbset{before skip=8pt, after skip=8pt, sharp corners,
+        left=8pt, right=8pt, top=6pt, bottom=6pt}
+\newtcolorbox{severitybox}[2][]{%
+  enhanced, breakable, sharp corners,
+  parbox=false,
+  frame hidden, boxrule=0pt,
+  colback=#2!6,
+  borderline west={3pt}{0pt}{#2!85},
+  title=#1,
+  fonttitle=\bfseries\sffamily,
+  coltitle=black,
+  varwidth boxed title,
+  title style={left color=#2!18, right color=#2!6}
+}
+% wrappery – tylko te, bez dodatkowych aliasów
+\newenvironment{boxcritical}[1][]{\begin{severitybox}[KRYTYCZNY • #1]{red}}{\end{severitybox}}
+\newenvironment{boxhigh}[1][]{\begin{severitybox}[WYSOKI • #1]{orange}}{\end{severitybox}}
+\newenvironment{boxmedium}[1][]{\begin{severitybox}[ŚREDNI • #1]{yellow!60!orange}}{\end{severitybox}}
+\newenvironment{boxlow}[1][]{\begin{severitybox}[NISKI • #1]{green!60!black}}{\end{severitybox}}
+\newenvironment{boxinfo}[1][]{\begin{severitybox}[INFORMACYJNY • #1]{cyan!60!black}}{\end{severitybox}}
+
+\usepackage{setspace}
+
+$if(footnotes-pretty)$
+\usepackage[hang,flushmargin,bottom,multiple]{footmisc}
+\setlength{\footnotemargin}{0.8em}
+\setlength{\footnotesep}{\baselineskip}
+\setlength{\skip\footins}{0.3cm}
+% \footskip kontroluje geometry – nie nadpisujemy tutaj
+$endif$
+
+% --- GLOBALNE MARGINESY ---
+$if(geometry)$
+\usepackage[$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
+$else$
+\usepackage[left=20mm,right=20mm,top=14mm,bottom=16mm,headsep=4mm,footskip=10mm,includeheadfoot,heightrounded,centering]{geometry}
+$endif$
+
+\usepackage{amsmath,amssymb}
+
+% --- numeracja sekcji ---
+$if(numbersections)$
+\setcounter{secnumdepth}{$if(secnumdepth)$$secnumdepth$$else$5$endif$}
+$else$
+\setcounter{secnumdepth}{-\maxdimen}
+$endif$
+
+% --- wspólne ustawienia pandoca ---
+$fonts.latex()$
+$font-settings.latex()$
+$common.latex()$
+$for(header-includes)$
+$header-includes$
+$endfor$
+$after-header-includes.latex()$
+$hypersetup.latex()$
+
+% --- linki w przypisach wstecz (po hyperref) ---
+$if(footnotes-disable-backlinks)$
+$else$
+\usepackage{footnotebackref}
+$endif$
+
+% --- czcionki i nagłówki (nadpisują ewentualne wcześniejsze) ---
+\usepackage{fontspec}
+\setmainfont{TeX Gyre Heros} % sans jako baza
+\setsansfont{TeX Gyre Heros}
+\setmonofont{DejaVu Sans Mono}
+\usepackage{microtype}
+\clubpenalty=10000 \widowpenalty=10000 \displaywidowpenalty=10000
+
+% --- tytuł/autor/data (pojedyncza definicja) ---
+\usepackage{titling}
+\title{$title$}
+$if(subtitle)$
+\pretitle{\begin{center}\huge\sffamily\bfseries}
+\posttitle{\par\Large\sffamily $subtitle$\end{center}}
+$else$
+\pretitle{\begin{center}\huge\sffamily\bfseries}
+\posttitle{\par\end{center}}
+$endif$
+\author{$for(author)$$author$$sep$, $endfor$}
+\date{$date$}
+
+% --- kolory i styl panelu metadanych na okładce ---
+\definecolor{TitleText}{HTML}{$if(titlepage-text-color)$$titlepage-text-color$$else$FFFFFF$endif$}
+\definecolor{Accent}{HTML}{$if(titlepage-rule-color)$$titlepage-rule-color$$else$4353B3$endif$}
+\tcbset{
+  securityblock/.style={
+    enhanced,
+    coltext=TitleText,
+    colback=black, opacityback=0.08,
+    frame hidden, boxrule=0pt, arc=3mm,
+    borderline west={2pt}{0pt}{Accent},
+    left=6mm, right=6mm, top=5mm, bottom=5mm
+  }
+}
+\newcommand{\tpLabel}[1]{\textbf{\textcolor{TitleText}{\MakeUppercase{#1}}}}
+\newcommand{\tpRow}[2]{\tpLabel{#1} & #2\\}
+
+$if(page-background)$
+\usepackage[pages=all]{background}
+$endif$
+
+% for the background color of the title page
+$if(titlepage)$
+\usepackage{pagecolor}
+\usepackage{afterpage}
+$if(titlepage-background)$
+\usepackage{tikz}
+$endif$
+$endif$
+
+% break urls
+\PassOptionsToPackage{hyphens}{url}
+\urlstyle{same}
+
+% csquotes (zalecane z babel/biblatex)
+\usepackage{csquotes}
+
+% captions
+\definecolor{caption-color}{HTML}{777777}
+\usepackage[font={stretch=1.2},
+  textfont={color=caption-color}, position=top, skip=4mm,
+  labelfont=bf, singlelinecheck=false,
+  justification=$if(caption-justification)$$caption-justification$$else$raggedright$endif$
+]{caption}
+\setcapindent{0em}
+\captionsetup[figure]{justification=centering}
+
+% blockquote
+\definecolor{blockquote-border}{RGB}{221,221,221}
+\definecolor{blockquote-text}{RGB}{119,119,119}
+\usepackage{mdframed}
+\newmdenv[rightline=false,bottomline=false,topline=false,linewidth=3pt,linecolor=blockquote-border,skipabove=\parskip]{customblockquote}
+\renewenvironment{quote}{\begin{customblockquote}\list{}{\rightmargin=0em\leftmargin=0em}\item\relax\color{blockquote-text}\ignorespaces}{\unskip\unskip\endlist\end{customblockquote}}
+
+% nagłówki
+\definecolor{heading-color}{RGB}{40,40,40}
+\addtokomafont{disposition}{\normalfont\color{heading-color}\bfseries\sffamily}
+
+% tabele (bez ponownego xcolor)
+$if(tables)$
+\definecolor{table-row-color}{HTML}{F5F5F5}
+\definecolor{table-rule-color}{HTML}{999999}
+\arrayrulecolor{table-rule-color}
+\setlength\heavyrulewidth{0.3ex}
+\renewcommand{\arraystretch}{1.3}
+$if(table-use-row-colors)$
+\usepackage{etoolbox}
+\usepackage{longtable}
+\usepackage{booktabs}
+\AtBeginEnvironment{longtable}{\rowcolors{2}{}{table-row-color!100}}
+\preto{\toprule}{\hiderowcolors}{}{}
+\appto{\endhead}{\showrowcolors}{}{}
+\appto{\endfirsthead}{\showrowcolors}{}{}
+$endif$
+$endif$
+
+% odstępy akapitów
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}
+
+% Listings
+$if(listings)$
+\usepackage{listings}
+\definecolor{listing-background}{HTML}{F7F7F7}
+\definecolor{listing-rule}{HTML}{B3B2B3}
+\definecolor{listing-numbers}{HTML}{B3B2B3}
+\definecolor{listing-text-color}{HTML}{000000}
+\definecolor{listing-keyword}{HTML}{435489}
+\definecolor{listing-keyword-2}{HTML}{1284CA}
+\definecolor{listing-keyword-3}{HTML}{9137CB}
+\definecolor{listing-identifier}{HTML}{435489}
+\definecolor{listing-string}{HTML}{00999A}
+\definecolor{listing-comment}{HTML}{8E8E8E}
+
+\lstdefinestyle{eisvogel_listing_style}{
+$if(listings-disable-line-numbers)$
+  xleftmargin      = 0.6em,
+  framexleftmargin = 0.4em,
+$else$
+  numbers          = left,
+  xleftmargin      = 2.7em,
+  framexleftmargin = 2.5em,
+$endif$
+  language         = java,
+  backgroundcolor  = \color{listing-background},
+  basicstyle       = \color{listing-text-color}\linespread{1.0}\lst@ifdisplaystyle$if(code-block-font-size)$$code-block-font-size$$else$\footnotesize$endif$\fi\ttfamily{},
+  breaklines       = true,
+  frame            = single,
+  framesep         = 0.19em,
+  rulecolor        = \color{listing-rule},
+  frameround       = ffff,
+  tabsize          = 2,
+  numberstyle      = \footnotesize\color{listing-numbers},
+  aboveskip        = 1.0em,
+  belowskip        = 0.1em,
+  breakindent      = 0pt,
+  abovecaptionskip = 0em,
+  belowcaptionskip = 1.0em,
+  keywordstyle     = {\color{listing-keyword}\bfseries},
+  keywordstyle     = {[2]\color{listing-keyword-2}\bfseries},
+  keywordstyle     = {[3]\color{listing-keyword-3}\bfseries\itshape},
+  sensitive        = true,
+  identifierstyle  = \color{listing-identifier},
+  commentstyle     = \color{listing-comment},
+  stringstyle      = \color{listing-string},
+  showstringspaces = false,
+  escapeinside     = {/*@}{@*/},
+  literate         =
+  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
+  {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
+  {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
+  {À}{{\`A}}1 {È}{{\`E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
+  {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+  {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+  {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
+  {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
+  {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
+  {ą}{{\k a}}1 {Ą}{{\k A}}1 {ę}{{\k e}}1 {Ę}{{\k E}}1
+  {ś}{{\'s}}1 {Ś}{{\'S}}1 {ć}{{\'c}}1 {Ć}{{\'C}}1
+  {ź}{{\'z}}1 {Ź}{{\'Z}}1 {ż}{{\.z}}1 {Ż}{{\.Z}}1
+  {ł}{{\l}}1  {Ł}{{\L}}1  {ń}{{\'n}}1 {Ń}{{\'N}}1
+  {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
+  {€}{{\EUR}}1 {£}{{\pounds}}1 {«}{{\guillemotleft}}1
+  {»}{{\guillemotright}}1 {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {¿}{{?`}}1
+  {…}{{\ldots}}1 {≥}{{>=}}1 {≤}{{<=}}1 {„}{{\glqq}}1 {“}{{\grqq}}1
+  {”}{{''}}1
+}
+\lstset{style=eisvogel_listing_style,columns=fullflexible,keepspaces=true}
+
+\lstdefinelanguage{Java}{
+  morekeywords={abstract,assert,break,case,catch,class,continue,default,
+    do,else,enum,exports,extends,final,finally,for,if,implements,
+    import,instanceof,interface,module,native,new,package,private,
+    protected,public,requires,return,static,strictfp,super,switch,
+    synchronized,this,throw,throws,transient,try,volatile,while,var},
+  morekeywords={[2]boolean,byte,char,double,float,int,long,short,
+    String,Boolean,Byte,Character,Double,Float,Integer,Long,Short,
+    Number,AtomicInteger,AtomicLong,BigDecimal,BigInteger,DoubleAccumulator,DoubleAdder,LongAccumulator,LongAdder,Short,
+    Object,Void,void},
+  morekeywords={[3]null,true,false},
+  sensitive,
+  morecomment=[l]//,
+  morecomment=[s]{/*}{*/},
+  morecomment=[s]{/**}{*/},
+  morestring=[b]", morestring=[b]'
+}
+
+\lstdefinelanguage{XML}{
+  morestring=[b]",
+  moredelim=[s][\bfseries\color{listing-keyword}]{<}{\ },
+  moredelim=[s][\bfseries\color{listing-keyword}]{</}{>},
+  moredelim=[l][\bfseries\color{listing-keyword}]{/>},
+  moredelim=[l][\bfseries\color{listing-keyword}]{>},
+  morecomment=[s]{<?}{?>},
+  morecomment=[s]{<!--}{-->},
+  commentstyle=\color{listing-comment},
+  stringstyle=\color{listing-string},
+  identifierstyle=\color{listing-identifier}
+}
+\lstdefinelanguage{HTML}{language=XML}
+$endif$
+
+% header and footer
+$if(disable-header-and-footer)$
+$else$
+\usepackage[headsepline,footsepline]{scrlayer-scrpage}
+\setheadsepline{0.3pt}
+\setfootsepline{0.3pt}
+\KOMAoptions{headlines=1,footlines=1}
+
+\newpairofpagestyles{eisvogel-header-footer}{
+  \clearpairofpagestyles
+  \ihead*{$if(header-left)$$header-left$$else$$if(shorttitle)$$shorttitle$$else$$title$$endif$$endif$}
+  \chead*{$if(header-center)$$header-center$$else$$endif$}
+  \ohead*{$if(header-right)$$header-right$$else$$date$$endif$}
+  \ifoot*{$if(footer-left)$$footer-left$$else$$if(version)$Wersja $version$$endif$$endif$}
+  \cfoot*{$if(footer-center)$$footer-center$$else$$endif$}
+  \ofoot*{$if(footer-right)$$footer-right$$else$\thepage$endif$}
+  \setkomafont{pageheadfoot}{\scriptsize\upshape}
+}
+\pagestyle{eisvogel-header-footer}
+
+$if(book)$
+\deftripstyle{ChapterStyle}{}{}{}{}{\pagemark}{}
+\renewcommand*{\chapterpagestyle}{ChapterStyle}
+$endif$
+
+$if(page-background)$
+\backgroundsetup{
+  scale=1,
+  color=black,
+  opacity=$if(page-background-opacity)$$page-background-opacity$$else$0.2$endif$,
+  angle=0,
+  contents={\includegraphics[width=\paperwidth,height=\paperheight]{$page-background$}}
+}
+$endif$
+$endif$
+
+% watermark
+$if(watermark)$
+\usepackage{draftwatermark}
+\SetWatermarkText{$watermark$}
+\SetWatermarkScale{.5}
+$endif$
+
+\begin{document}
+
+$if(titlepage)$
+\begin{titlepage}
+\newgeometry{top=2.8cm, right=2.8cm, bottom=2.8cm, left=2.8cm}
+
+$if(titlepage-color)$
+\definecolor{titlepage-color}{HTML}{$titlepage-color$}
+\newpagecolor{titlepage-color}\afterpage{\restorepagecolor}
+$endif$
+
+\newcommand{\colorRule}[3][black]{\textcolor[HTML]{#1}{\rule{#2}{#3}}}
+
+$if(titlepage-background)$
+\tikz[remember picture,overlay] \node[inner sep=0pt] at (current page.center)
+{\includegraphics[width=\paperwidth,height=\paperheight,keepaspectratio]{$titlepage-background$}};
+$endif$
+
+% górna linia
+\noindent\color[HTML]{$if(titlepage-text-color)$$titlepage-text-color$$else$333333$endif$}
+\makebox[0pt][l]{\colorRule[$if(titlepage-rule-color)$$titlepage-rule-color$$else$4353B3$endif$]{\paperwidth}{$if(titlepage-rule-height)$$titlepage-rule-height$$else$3$endif$pt}}
+\vspace*{3.2em}
+
+% tytuł / podtytuł
+\begin{center}
+{\huge \bfseries \sffamily $title$ \par}
+$if(subtitle)$
+\vspace{0.6em}{\Large \sffamily $subtitle$ \par}
+$endif$
+$if(titlepage-background)$
+$else$
+\vspace{0.4em}{\normalsize \sffamily $date$ \par}
+$endif$
+\end{center}
+
+% blok danych projektu w panelu
+\vspace{1.6em}
+\begin{tcolorbox}[securityblock]
+\setstretch{1.2}
+\begin{tabularx}{\linewidth}{@{}p{0.42\linewidth} X@{}}
+\tpRow{Przedmiot prac}{$if(work_subject)$$work_subject$$endif$}
+\tpRow{Data wykonania prac}{$if(work_dates)$$work_dates$$endif$}
+\tpRow{Data wykonania retestów}{$if(retest_dates)$$retest_dates$$endif$}
+\tpRow{Autor}{$if(author)$ $for(author)$$author$$sep$, $endfor$ $endif$}
+\tpRow{Recenzent}{$if(recenzent)$ $for(recenzent)$$recenzent$$sep$, $endfor$ $endif$}
+\tpRow{Wersja dokumentu}{$if(version)$ Wersja $version$ $endif$}
+\end{tabularx}
+\end{tcolorbox}
+
+% logo w prawym górnym rogu
+$if(titlepage-logo)$
+\tikz[remember picture,overlay]
+\node[
+  anchor=north east,
+  inner sep=0pt,
+  xshift=-2.8cm,
+  yshift=-2.4cm
+] at (current page.north east)
+{\includegraphics[width=$if(logo-width)$$logo-width$$else$28mm$endif$]{$titlepage-logo$}};
+$endif$
+
+\restoregeometry
+\end{titlepage}
+\pagenumbering{arabic}
+$endif$
+
+$if(has-frontmatter)$
+\frontmatter
+$endif$
+
+$if(abstract)$
+\begin{abstract}
+$abstract$
+\end{abstract}
+$endif$
+
+$if(first-chapter)$
+\setcounter{chapter}{$first-chapter$}
+\addtocounter{chapter}{-1}
+$endif$
+
+$for(include-before)$
+$include-before$
+
+$endfor$
+
+$if(toc)$
+$if(toc-title)$
+\renewcommand*\contentsname{$toc-title$}
+$endif$
+{
+$if(colorlinks)$
+\hypersetup{linkcolor=$if(toccolor)$$toccolor$$else$$endif$}
+$endif$
+\setcounter{tocdepth}{$if(toc-depth)$$toc-depth$$else$2$endif$}
+\tableofcontents
+$if(toc-own-page)$
+\newpage
+$endif$
+}
+$endif$
+
+$if(lof)$
+\listoffigures
+$endif$
+$if(lot)$
+\listoftables
+$endif$
+
+$if(linestretch)$
+\setstretch{$linestretch$}
+$endif$
+
+$if(has-frontmatter)$
+\mainmatter
+$endif$
+
+$body$
+
+$if(has-frontmatter)$
+\backmatter
+$endif$
+
+$if(nocite-ids)$
+\nocite{$for(nocite-ids)$$it$$sep$, $endfor$}
+$endif$
+
+$if(natbib)$
+$if(bibliography)$
+$if(biblio-title)$
+$if(has-chapters)$
+\renewcommand\bibname{$biblio-title$}
+$else$
+\renewcommand\refname{$biblio-title$}
+$endif$
+$endif$
+\bibliography{$for(bibliography)$$bibliography$$sep$,$endfor$}
+$endif$
+$endif$
+
+$if(biblatex)$
+\printbibliography$if(biblio-title)$[title=$biblio-title$]$endif$
+$endif$
+
+$for(include-after)$
+$include-after$
+
+$endfor$
+\end{document}

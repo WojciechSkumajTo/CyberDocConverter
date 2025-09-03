@@ -1,0 +1,53 @@
+lang: pl-PL
+babel-lang: polish
+
+title: "Raport z testów bezpieczeństwa"
+subtitle: "Biuro Cyberbezpieczeństwa"
+date: "2025-08-21"
+
+author: ["Wojciech Dołowy"]
+recenzent: ["Jan Kowalski"]
+version: "1.0"
+
+work_subject: "Aplikacja XYZ"
+work_dates: "2025-08-10 – 2025-08-15"
+retest_dates: "-"
+
+titlepage: true
+titlepage-color: "111827"
+titlepage-text-color: "FFFFFF"
+titlepage-rule-color: "4353B3"
+titlepage-rule-height: 3
+titlepage-logo: "assets/branding/logo.png"
+logo-width: "28mm"
+titlepage-background: "assets/branding/background.pdf"
+
+toc-own-page: true
+fontsize: 11pt
+papersize: a4
+colorlinks: true
+code-block-font-size: "\\small"
+listings-disable-line-numbers: false
+
+from: markdown+raw_tex
+filters:
+  - env.lua
+
+header-includes:
+  - '\usepackage{array,tabularx,booktabs,siunitx,makecell,colortbl}'
+  - '\sisetup{detect-all,output-decimal-marker=.,table-number-alignment=right}'
+  - '\renewcommand\arraystretch{1.22}'
+  - '\definecolor{Crit}{HTML}{B91C1C}'
+  - '\definecolor{High}{HTML}{C2410C}'
+  - '\definecolor{Med}{HTML}{B45309}'
+  - '\definecolor{Low}{HTML}{15803D}'
+  - '\definecolor{Info}{HTML}{0EA5E9}'
+  - '\newcommand{\headercell}[1]{\textcolor[HTML]{64748B}{\small\MakeUppercase{#1}}}'
+  - '\newcommand{\cvssrange}[2]{\numrange{#1}{#2}}'
+  - '\newcommand{\sevpill}[2]{\tcbox[on line, boxsep=1.2pt, left=4pt, right=4pt, top=1pt, bottom=1pt, boxrule=0pt, arc=99pt, colback=#1!10, colframe=#1!60]{\textbf{\textcolor{#1}{#2}}}}'
+  - '\usepackage{tcolorbox}'
+  - '\usepackage{tocloft}'
+  - '\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}'
+
+
+

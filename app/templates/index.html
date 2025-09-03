@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pandoc → PDF</title>
+    <meta name="color-scheme" content="dark light">
+    <link rel="stylesheet" href="/static/style.css">
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <h1>Pandoc → PDF</h1>
+          <div class="sub">Upload tylko katalogu z raportem Markdown. Styl pod security.</div>
+        </div>
+      </header>
+      <section class="card" aria-labelledby="h-form">
+        <h2 id="h-form" class="sr-only">Formularz konwersji</h2>
+        <form id="f" novalidate>
+          <label>Wybierz lub przeciągnij katalog (<code>.md</code> + obrazy)</label>
+          <div id="drop" class="drop" role="group" aria-label="Przeciągnij katalog lub kliknij, by wybrać">
+            <div class="row">
+              <strong>Przeciągnij i upuść katalog</strong>
+              <span class="muted">lub</span>
+              <button type="button" id="pick" class="secondary">Wybierz katalog</button>
+            </div>
+            <div class="badges" id="stats" aria-live="polite"></div>
+            <input id="dir" name="files" type="file" webkitdirectory directory multiple aria-label="Wybierz katalog" />
+          </div>
+          <div class="controls">
+            <button id="go" type="submit"><span class="txt">Konwertuj do PDF</span></button>
+            <button type="button" id="clear" class="secondary">Wyczyść</button>
+          </div>
+          <div id="msg" role="status" aria-live="polite"></div>
+          <details id="filesBox" hidden>
+            <summary>Wybrane pliki</summary>
+            <div class="list" id="fileList"></div>
+          </details>
+        </form>
+        <footer>Backend oczekuje pola <code>files</code> z zachowanymi ścieżkami.</footer>
+      </section>
+    </div>
+    <script src="/static/main.js"></script>
+  </body>
+</html>
