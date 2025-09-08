@@ -1,0 +1,71 @@
+\begingroup
+% --- lokalne style i makra tylko dla tej tabeli ---
+
+% „Tag” dla poziomu: wymuś lokalne nadpisanie \sevpill
+\makeatletter
+\@ifundefined{sevpill}{%
+  \newcommand{\sevpill}[2]{%
+    \tikz[baseline=(P.base)]\node
+      (P) [inner sep=1pt, outer sep=0pt, rounded corners=2pt,
+           draw=#1!70!black, fill=#1!12, text=#1!40!black]
+      {\footnotesize\bfseries\sffamily #2};%
+  }%
+}{%
+  \renewcommand{\sevpill}[2]{%
+    \tikz[baseline=(P.base)]\node
+      (P) [inner sep=1pt, outer sep=0pt, rounded corners=2pt,
+           draw=#1!70!black, fill=#1!12, text=#1!40!black]
+      {\footnotesize\bfseries\sffamily #2};%
+  }%
+}
+\makeatother
+
+% Kolory pomocnicze dla tabeli (unikalne nazwy, bez kolizji)
+\providecolor{VulnTblStripe}{HTML}{F5F5F5}
+\providecolor{VulnTblRule}{HTML}{999999}
+
+% Długości kolumn
+\newlength{\VulnColA}
+\newlength{\VulnColC}
+\setlength{\VulnColA}{28mm}
+\setlength{\VulnColC}{20mm}
+
+% Pomocnicze makra do układu
+\newcommand{\pillscale}{1.0}
+\newcommand{\scalepill}[2]{%
+  \raisebox{0pt}[0pt][0pt]{\scalebox{\pillscale}{\sevpill{#1}{#2}}}%
+}
+\newcommand{\pillbox}[2]{\makebox[\VulnColA][c]{\scalepill{#1}{#2}}}
+\newcommand{\cvss}[1]{\textcolor{gray!50!black}{\texttt{#1}}}
+
+% Ustawienia tabeli
+\arrayrulecolor{VulnTblRule}
+\setlength{\tabcolsep}{6pt}
+\renewcommand{\arraystretch}{1.3}
+
+\begin{table}[H]
+\centering
+\rowcolors{2}{VulnTblStripe}{white}
+\begin{tabularx}{\linewidth}{@{} >{\centering\arraybackslash}p{\VulnColA} >{\arraybackslash}X >{\centering\arraybackslash}p{\VulnColC} @{}}
+\rowcolor{gray!20}
+\textbf{Poziom} & \textbf{Kryteria skrótowe} & \textbf{CVSS (v4.0)} \\
+\hline
+\pillbox{Crit}{KRYTYCZNY} &
+Podatności o najwyższym stopniu zagrożenia, które pozwalają na \textbf{zdalne wykonanie kodu} lub \textbf{całkowite przejęcie kontroli nad systemem} \emph{bez dodatkowych warunków}. Ich wykorzystanie prowadzi do \textbf{pełnej utraty poufności, integralności i dostępności}. Wymagają \textbf{natychmiastowej reakcji} i \textbf{pilnego wdrożenia poprawek}. &
+\cvss{9.0-10.0} \\
+\pillbox{High}{WYSOKI} &
+Podatności, które stwarzają \textbf{poważne ryzyko} i mogą prowadzić do \textbf{eskalacji uprawnień}, uzyskania \textbf{nieautoryzowanego dostępu} do danych poufnych lub \textbf{zakłócenia działania systemu}. Ich wykorzystanie często wymaga \emph{specyficznych warunków}, jednak potencjalne szkody są znaczne. Powinny być traktowane jako \textbf{wysoki priorytet} w procesie zarządzania ryzykiem. &
+\cvss{7.0-8.9} \\
+\pillbox{Med}{ŚREDNI} &
+Podatności o \textbf{ograniczonym wpływie} na bezpieczeństwo, które mogą być wykorzystane jedynie w \emph{określonych warunkach} lub wymagają \emph{interakcji użytkownika} (np. kliknięcia w złośliwy link). Ich eliminacja może być realizowana w ramach \textbf{planowych działań utrzymaniowych}, jednak nie należy ich ignorować. &
+\cvss{4.0-6.9} \\
+\pillbox{Low}{NISKI} &
+Podatności o \textbf{marginalnym wpływie} na bezpieczeństwo środowiska. Ich wykorzystanie wymaga \emph{bardzo specyficznych warunków technicznych} lub \emph{lokalnego dostępu} do systemu. W większości przypadków nie prowadzą do poważnych szkód. Ich usunięcie może być realizowane \textbf{w dalszej kolejności}, po wyeliminowaniu podatności o wyższym priorytecie. &
+\cvss{0.1-3.9} \\
+\pillbox{Info}{INFORMACYJNY} &
+Zjawiska, które \textbf{nie stanowią bezpośredniego zagrożenia}, lecz mogą wskazywać na \textbf{błędy w konfiguracji} lub inne problemy. Chociaż \emph{nie wymagają natychmiastowych działań}, ich naprawa jest zalecana w celu \textbf{poprawy ogólnej higieny cyberbezpieczeństwa}. &
+\cvss{—} \\
+\hline
+\end{tabularx}
+\end{table}
+\endgroup

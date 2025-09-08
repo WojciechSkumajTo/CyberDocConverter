@@ -28,13 +28,9 @@ $endif$
 \usepackage[table]{xcolor}
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage{tikzfill}
 \usepackage{array}
 \usepackage{tabularx}
 \usepackage{pgfplots}
-\usepackage[utf8]{inputenc}
-\usepackage[headsepline,footsepline,plainheadsepline,plainfootsepline]{scrlayer-scrpage}
-
 
 % centrowanie wszystkich figure
 \let\origfigure\figure
@@ -42,7 +38,6 @@ $endif$
 \renewenvironment{figure}[1][htbp]{\origfigure[#1]\centering}{\endorigfigure}
 
 \usepackage{tikz}
-\usepackage{tabularx}
 \usepackage[most]{tcolorbox}
 
 % --- Severity boxes ---
@@ -52,8 +47,8 @@ $endif$
   enhanced, breakable, sharp corners,
   parbox=false,
   frame hidden, boxrule=0pt,
-  colback=#2!6,
-  borderline west={3pt}{0pt}{#2!85},
+  colback=#2!12,
+  borderline west={4pt}{0pt}{#2!90},
   title=#1,
   fonttitle=\bfseries\sffamily,
   coltitle=black,
@@ -111,7 +106,7 @@ $endif$
 
 % --- czcionki i nagłówki (nadpisują ewentualne wcześniejsze) ---
 \usepackage{fontspec}
-\setmainfont{TeX Gyre Heros} % sans jako baza
+\setmainfont{TeX Gyre Heros}
 \setsansfont{TeX Gyre Heros}
 \setmonofont{DejaVu Sans Mono}
 \usepackage{microtype}
@@ -154,9 +149,6 @@ $endif$
 $if(titlepage)$
 \usepackage{pagecolor}
 \usepackage{afterpage}
-$if(titlepage-background)$
-\usepackage{tikz}
-$endif$
 $endif$
 
 % break urls
@@ -233,7 +225,6 @@ $else$
   xleftmargin      = 2.7em,
   framexleftmargin = 2.5em,
 $endif$
-  language         = java,
   backgroundcolor  = \color{listing-background},
   basicstyle       = \color{listing-text-color}\linespread{1.0}\lst@ifdisplaystyle$if(code-block-font-size)$$code-block-font-size$$else$\footnotesize$endif$\fi\ttfamily{},
   breaklines       = true,
@@ -401,6 +392,8 @@ $endif$
 \tpRow{Autor}{$if(author)$ $for(author)$$author$$sep$, $endfor$ $endif$}
 \tpRow{Recenzent}{$if(recenzent)$ $for(recenzent)$$recenzent$$sep$, $endfor$ $endif$}
 \tpRow{Wersja dokumentu}{$if(version)$ Wersja $version$ $endif$}
+\tpRow{Numer wniosku}{$if(request_number)$$request_number$$endif$}
+\tpRow{CRA aplikacji}{$if(app_cra)$$app_cra$$endif$}
 \end{tabularx}
 \end{tcolorbox}
 

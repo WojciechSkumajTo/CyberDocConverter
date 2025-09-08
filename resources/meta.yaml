@@ -9,6 +9,9 @@ author: ["Wojciech Dołowy"]
 recenzent: ["Jan Kowalski"]
 version: "1.0"
 
+request_number: "1232312"
+app_cra: "CRA-123"
+
 work_subject: "Aplikacja XYZ"
 work_dates: "2025-08-10 – 2025-08-15"
 retest_dates: "-"
@@ -26,28 +29,73 @@ toc-own-page: true
 fontsize: 11pt
 papersize: a4
 colorlinks: true
+linkcolor: "Link"     # nazwy kolorów zdefiniowane niżej
+urlcolor:  "URL"
+citecolor: "Cite"
 code-block-font-size: "\\small"
 listings-disable-line-numbers: false
 
 from: markdown+raw_tex
+
 filters:
-  - env.lua
+  - filters/env.lua
 
 header-includes:
-  - '\usepackage{array,tabularx,booktabs,siunitx,makecell,colortbl}'
-  - '\sisetup{detect-all,output-decimal-marker=.,table-number-alignment=right}'
-  - '\renewcommand\arraystretch{1.22}'
-  - '\definecolor{Crit}{HTML}{B91C1C}'
-  - '\definecolor{High}{HTML}{C2410C}'
-  - '\definecolor{Med}{HTML}{B45309}'
-  - '\definecolor{Low}{HTML}{15803D}'
+  # biblioteki potrzebne filtrom i wykresom
+  - '\usepackage{placeins}'
+  - '\usepackage[autostyle,polish=quotes]{csquotes}'
+  - '\usepackage[export]{adjustbox}'
+  - '\usetikzlibrary{calc,positioning}'
+  - '\pgfplotsset{
+      compat=1.18,
+      every axis/.style={
+        font=\small\sffamily,
+        axis line style={line cap=round, ultra thin, gray!50},
+        grid=major, grid style={dashed, gray!20},
+        tick align=outside,
+        /pgf/number format/use comma,
+        /pgf/number format/1000 sep={\,}
+      }
+    }'
+  - '\usepackage{siunitx}'
+  - '\sisetup{
+      detect-all,
+      output-decimal-marker = {,},
+      group-separator       = {\,},
+      group-minimum-digits  = 4,
+      table-number-alignment= right,
+      tight-spacing         = true,
+      range-phrase          = {\,–\,}
+    }'
+
+  # kolory linków używane przez $hypersetup.latex()$ (bez \hypersetup tutaj)
+  - '\definecolor{Link}{rgb}{0.10,0.10,0.10}'
+  - '\definecolor{URL}{rgb}{0.00,0.30,0.55}'
+  - '\definecolor{Cite}{rgb}{0.00,0.30,0.55}'
+
+  # kolory poziomów
+  - '\definecolor{Crit}{HTML}{6D28D9}'
+  - '\definecolor{High}{HTML}{DC2626}'
+  - '\definecolor{Med}{HTML}{F97316}'
+  - '\definecolor{Low}{HTML}{16A34A}'
   - '\definecolor{Info}{HTML}{0EA5E9}'
+
+  # ścieżki zasobów
+  - '\graphicspath{{src/}{assets/images/}{assets/branding/}}'
+
+  # makra
   - '\newcommand{\headercell}[1]{\textcolor[HTML]{64748B}{\small\MakeUppercase{#1}}}'
   - '\newcommand{\cvssrange}[2]{\numrange{#1}{#2}}'
   - '\newcommand{\sevpill}[2]{\tcbox[on line, boxsep=1.2pt, left=4pt, right=4pt, top=1pt, bottom=1pt, boxrule=0pt, arc=99pt, colback=#1!10, colframe=#1!60]{\textbf{\textcolor{#1}{#2}}}}'
-  - '\usepackage{tcolorbox}'
+
+  # liczniki do wykresu
+  - '\providecommand{\vcrit}{0}'
+  - '\providecommand{\vhigh}{0}'
+  - '\providecommand{\vmed}{0}'
+  - '\providecommand{\vlow}{0}'
+  - '\providecommand{\vinfo}{0}'
+  - '\providecommand{\setvulncounts}[5]{\renewcommand{\vcrit}{#1}\renewcommand{\vhigh}{#2}\renewcommand{\vmed}{#3}\renewcommand{\vlow}{#4}\renewcommand{\vinfo}{#5}}'
+
+  # spis treści – kropkowanie
   - '\usepackage{tocloft}'
   - '\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}'
-
-
-

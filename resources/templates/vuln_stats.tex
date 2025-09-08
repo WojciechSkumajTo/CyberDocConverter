@@ -1,0 +1,50 @@
+\begingroup
+% Wykres korzysta z kolorów Crit/High/Med/Low/Info z preambuły
+% oraz z liczników \vcrit...\vinfo ustawianych np. przez \setvulncounts.
+% Dajemy bezpieczne wartości domyślne, jeśli nie ustawiono.
+\providecommand{\vcrit}{0}
+\providecommand{\vhigh}{0}
+\providecommand{\vmed}{0}
+\providecommand{\vlow}{0}
+\providecommand{\vinfo}{0}
+
+\noindent
+\begin{tikzpicture}
+\pgfmathsetmacro{\MaxCount}{max(\vcrit,\vhigh,\vmed,\vlow,\vinfo)}
+\begin{axis}[
+  font=\small\sffamily,
+  xbar, bar width=25pt, bar shift=0pt,
+  width=0.75\linewidth, height=9.2cm, scale only axis=true,
+  trim axis left, trim axis right,
+  enlarge y limits=0.15,
+  enlarge x limits=0,
+  symbolic y coords={crit,high,med,low,info},
+  ytick={crit,high,med,low,info},
+  yticklabels={Zagrożenie krytyczne,Zagrożenie wysokie,Zagrożenie średnie,Zagrożenie niskie, Informacyjne},
+  y dir=reverse,
+  yticklabel style={font=\small\sffamily\bfseries,anchor=east},
+  ytick style={draw=none},
+  xmin=0, xmax={\MaxCount + 2},
+  xtick distance=2, tick align=outside,
+  xlabel={Liczba podatności},
+  xlabel style={font=\small\sffamily\bfseries,at={(axis description cs:0.5,-0.12)},anchor=north},
+  axis line style={line cap=round, ultra thin, gray!50},
+  grid=major, grid style={dashed, gray!20},
+  nodes near coords,
+  nodes near coords align={left},
+  every node near coord/.append style={
+    anchor=east, xshift=-3pt, text=white, font=\small\sffamily\bfseries,
+    /pgf/number format/fixed
+  },
+  axis background/.style={fill=none, draw=none},
+  axis x line*=bottom, axis y line*=left,
+  every axis plot/.append style={fill opacity=1, draw opacity=1, rounded corners=3pt, line width=0.6pt}
+]
+\addplot+[fill=Crit, draw=Crit!70!black] coordinates {(\vcrit,crit)};
+\addplot+[fill=High, draw=High!70!black] coordinates {(\vhigh,high)};
+\addplot+[fill=Med,  draw=Med!70!black]  coordinates {(\vmed,med)};
+\addplot+[fill=Low,  draw=Low!70!black]  coordinates {(\vlow,low)};
+\addplot+[fill=Info, draw=Info!70!black] coordinates {(\vinfo,info)};
+\end{axis}
+\end{tikzpicture}
+\endgroup
