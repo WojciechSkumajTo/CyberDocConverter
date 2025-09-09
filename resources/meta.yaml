@@ -29,7 +29,7 @@ toc-own-page: true
 fontsize: 11pt
 papersize: a4
 colorlinks: true
-linkcolor: "Link"     # nazwy kolorów zdefiniowane niżej
+linkcolor: "Link"
 urlcolor:  "URL"
 citecolor: "Cite"
 code-block-font-size: "\\small"
