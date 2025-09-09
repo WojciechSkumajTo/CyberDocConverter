@@ -1,6 +1,3 @@
--- Ulepszone podpisy (Figure N: …, pogrubiony label, zwykły tekst)
--- Bezpieczeństwo ścieżek: blokada wyjścia poza PROJECT_ROOT
-
 local path = require 'pandoc.path'
 
 -- === Bezpieczeństwo ścieżek ===
@@ -35,7 +32,7 @@ local function caption_text(inlines) return latex_escape(pandoc.utils.stringify(
 -- === Resolucja ścieżek obrazów z blokadą wyjścia poza projekt ===
 local function resolve_image(src)
   if not src or src=='' then return src end
-  if src:match("^%a+://") then return src end -- URL zostaw
+  if src:match("^%a+://") then return src end
   local inputdir = os.getenv("INPUT_DIR") or "."
   local project  = path.normalize(os.getenv("PROJECT_ROOT") or inputdir)
 
@@ -45,7 +42,7 @@ local function resolve_image(src)
   local p2 = (src:sub(1,1)=="/") and path.normalize(src) or path.normalize(path.join({project, src}))
   if file_exists(p2) and is_within(project, p2) then return path.make_relative(p2, inputdir) end
 
-  return src -- poza projektem: zostaw, TeX zgłosi błąd
+  return src
 end
 
 -- === Globalna konfiguracja stylu podpisów ===
@@ -68,12 +65,11 @@ local function inject_caption_setup(meta)
   return meta
 end
 
--- === Budowa bloku obrazka z podpisem ===
+
 local function blocks_image(img)
   local src    = resolve_image(img.src)
   local width  = width_spec(img.attr)
 
-  -- atrybuty: caption / shortcaption / source / label; alt jako fallback
   local cap_attr   = img.attr.attributes and img.attr.attributes["caption"]
   local short_attr = img.attr.attributes and img.attr.attributes["shortcaption"]
   local source_attr= img.attr.attributes and img.attr.attributes["source"]
@@ -89,7 +85,7 @@ local function blocks_image(img)
   end
   local cap_short = short_attr and latex_escape(short_attr) or nil
   local hascap = cap_full ~= ''
-  local numbered = hascap and not has_class(img.attr, "nonumber") -- domyślnie numeruj
+  local numbered = hascap and not has_class(img.attr, "nonumber")
 
   local t = {}
   t[#t+1] = pandoc.RawBlock('latex','\\makeatletter\\@ifundefined{pandocImgBox}{\\newsavebox{\\pandocImgBox}}{}\\makeatother')
@@ -117,7 +113,6 @@ local function blocks_image(img)
   return t
 end
 
--- === Ramki dla sekcji podatności (bez zmian funkcjonalnych) ===
 local Boxes = {
   critical = {open='\\begin{severitybox}[KRYTYCZNY]{Crit}',  close='\\end{severitybox}'},
   high     = {open='\\begin{severitybox}[WYSOKI]{High}',     close='\\end{severitybox}'},
@@ -150,7 +145,6 @@ end
 function Para(el)  return handle_para_like(el) end
 function Plain(el) return handle_para_like(el) end
 
--- Obrazy inline: tylko popraw ścieżkę
 function Image(el) el.src = resolve_image(el.src); return el end
 
 function HorizontalRule() return pandoc.RawBlock('latex','\\noindent\\rule{\\linewidth}{0.4pt}') end
