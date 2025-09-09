@@ -1,5 +1,11 @@
-local MAX_H = '0.65\\textheight'   -- limit wysokości po skalowaniu
+-- resources/filters/env.lua
 
+local path = require 'pandoc.path'
+
+-- maksymalna wysokość obrazka po skalowaniu
+local MAX_H = '0.65\\textheight'
+
+-- mapowanie poziomów na ramki
 local M = {
   critical = {open='\\begin{severitybox}[KRYTYCZNY]{Crit}',  close='\\end{severitybox}'},
   high     = {open='\\begin{severitybox}[WYSOKI]{High}',     close='\\end{severitybox}'},
@@ -8,7 +14,14 @@ local M = {
   info     = {open='\\begin{severitybox}[INFORMACYJNY]{Info}', close='\\end{severitybox}'},
 }
 
+-- prosty test istnienia pliku
+local function file_exists(p)
+  local f = io.open(p, "rb")
+  if f then f:close(); return true end
+  return false
+end
 
+-- escapowanie do LaTeX
 local function latex_escape(s)
   if not s or s == '' then return '' end
   local map = { ['\\']='\\textbackslash{}',['{']='\\{',['}']='\\}',
@@ -17,6 +30,7 @@ local function latex_escape(s)
   return (s:gsub('[\\%%{}#&_^~]', map))
 end
 
+-- szerokość obrazka
 local function width_spec(attr)
   if not attr or not attr.attributes then return '\\linewidth' end
   local w = attr.attributes['width']
@@ -25,12 +39,40 @@ local function width_spec(attr)
   return p and (tostring(tonumber(p)/100) .. '\\linewidth') or w
 end
 
+-- podpis
 local function caption_text(inlines)
   return latex_escape(pandoc.utils.stringify(inlines or {}))
 end
 
+-- przepisanie ścieżki obrazka:
+-- 1) spróbuj jak jest, względem katalogu .md (INPUT_DIR)
+-- 2) jeśli brak, potraktuj src jako ścieżkę od root projektu (PROJECT_ROOT)
+--    i zamień na relatywną do katalogu .md
+local function resolve_image(src)
+  if not src or src == '' then return src end
+  if src:match("^%a+://") or src:sub(1,1) == "/" then
+    return src
+  end
+  local inputdir = os.getenv("INPUT_DIR") or "."
+  local project  = os.getenv("PROJECT_ROOT") or inputdir
+
+  local p1 = path.normalize(path.join({inputdir, src}))
+  if file_exists(p1) then
+    return src
+  end
+
+  local p2 = path.normalize(path.join({project, src}))
+  if file_exists(p2) then
+    return path.make_relative(p2, inputdir)
+  end
+
+  -- brak pliku: zostaw oryginał (pozwoli zobaczyć błąd w logu TeX)
+  return src
+end
+
+-- generowanie bloku z obrazkiem w ramce
 local function blocks_image(img)
-  local src    = img.src
+  local src    = resolve_image(img.src)
   local width  = width_spec(img.attr)
   local cap    = caption_text(img.caption)
   local hascap = cap ~= ''
@@ -53,7 +95,7 @@ local function blocks_image(img)
   return t
 end
 
-
+-- ramki dla sekcji podatności
 function Div(el)
   if not FORMAT:match('latex') then return nil end
   for _, cls in ipairs(el.classes) do
@@ -71,6 +113,7 @@ function Div(el)
   return nil
 end
 
+-- zamiana akapitów z pojedynczym obrazkiem na blok z kontrolą rozmiaru
 local function handle_para_like(el)
   if #el.content == 1 and el.content[1].t == 'Image' then
     return blocks_image(el.content[1])
@@ -81,8 +124,14 @@ end
 function Para(el)  return handle_para_like(el) end
 function Plain(el) return handle_para_like(el) end
 
+-- pojedyncze obrazy w treści (np. w akapicie z tekstem) – przepisz src
+function Image(el)
+  el.src = resolve_image(el.src)
+  return el
+end
+
 function HorizontalRule()
   return pandoc.RawBlock('latex','\\noindent\\rule{\\linewidth}{0.4pt}')
 end
 
-return { { Div=Div, Para=Para, Plain=Plain, HorizontalRule=HorizontalRule } }
+return { { Div=Div, Para=Para, Plain=Plain, Image=Image, HorizontalRule=HorizontalRule } }

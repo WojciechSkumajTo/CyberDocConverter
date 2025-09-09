@@ -1,4 +1,3 @@
-# app/services/convert.py
 import os
 import re
 import shutil
@@ -11,7 +10,6 @@ RES = APP_ROOT.parent / "resources"                     # /srv/resources
 ASSETS = APP_ROOT.parent / "assets"                     # /srv/assets
 
 PANDOC_FROM = "markdown+raw_tex+link_attributes-implicit_figures"
-# Pozostaje LaTeX; można nadpisać: PANDOC_PDF_ENGINE=xelatex/lualatex
 PDF_ENGINE = os.getenv("PANDOC_PDF_ENGINE", "xelatex")
 PANDOC_TIMEOUT_SEC = 180
 
@@ -22,7 +20,7 @@ def build_cmd(
     workdir: pathlib.Path,
     meta_override: Optional[dict[str, str]] = None,
 ) -> list[str]:
-    # Resource-path dla Pandoca (nie szkodzi, choć grafiki i tak znajdzie TeX)
+    # resource-path (pomaga Pandocowi, grafiki i tak finalnie rozwiąże TeX)
     rpaths = [
         inp.parent,
         workdir,
@@ -45,11 +43,10 @@ def build_cmd(
         "--output", str(out_pdf),
     ]
 
-    # Zasoby globalne
+    # globalne zasoby
     meta_file = RES / "meta.yaml"
     template = RES / "templates" / "eisvogel.tex"
     lua_filter = RES / "filters" / "env.lua"
-
 
     if meta_file.exists():
         cmd += ["--metadata-file", str(meta_file)]
@@ -78,7 +75,7 @@ def convert_markdown_tree(
     workdir = workdir.resolve()
     inp = (workdir / md_relpath).resolve()
 
-    # Blokada wyjścia poza workdir
+    # blokada wyjścia poza workdir
     try:
         inp.relative_to(workdir)
     except ValueError:
@@ -87,7 +84,7 @@ def convert_markdown_tree(
     if not inp.is_file():
         raise FileNotFoundError(f"Nie znaleziono pliku Markdown: {md_relpath}")
 
-    # Skopiuj assets do projektu użytkownika (opcjonalnie)
+    # opcjonalne assets skopiowane do projektu
     if ASSETS.exists():
         shutil.copytree(ASSETS, workdir / "assets", dirs_exist_ok=True)
 
@@ -96,16 +93,18 @@ def convert_markdown_tree(
 
     env = os.environ.copy()
     env["TEXMFVAR"] = str(workdir / ".texlive-var")
-    # Klucz: rekursywne przeszukiwanie całego resources/ i workdir/
+    # rekursywne szukanie plików TeX w resources/ i w całym drzewie projektu
     env["TEXINPUTS"] = f"{RES.as_posix()}//:{workdir.as_posix()}//:"
-    # Trzymaj sandbox; nie używamy ścieżek absolutnych po \input@path/\graphicspath
-    env["openin_any"] = "p"
+    # pozwól na '..' wewnątrz drzewa (wymagane dla przepisywania ścieżek)
+    env["openin_any"] = "r"
+    # podaj ścieżki dla filtra Lua
+    env["PROJECT_ROOT"] = workdir.as_posix()
+    env["INPUT_DIR"] = inp.parent.as_posix()
 
     try:
         subprocess.run(
             cmd,
-            # Względne ścieżki obrazów liczone od katalogu pliku .md
-            cwd=inp.parent,
+            cwd=inp.parent,  # ścieżki względne liczone od katalogu pliku .md
             check=True,
             capture_output=True,
             timeout=PANDOC_TIMEOUT_SEC,
