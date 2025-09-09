@@ -1,3 +1,4 @@
+# app/services/convert.py
 import os
 import re
 import shutil
@@ -10,7 +11,8 @@ RES = APP_ROOT.parent / "resources"                     # /srv/resources
 ASSETS = APP_ROOT.parent / "assets"                     # /srv/assets
 
 PANDOC_FROM = "markdown+raw_tex+link_attributes-implicit_figures"
-PDF_ENGINE = "lualatex"
+# Pozostaje LaTeX; można nadpisać: PANDOC_PDF_ENGINE=xelatex/lualatex
+PDF_ENGINE = os.getenv("PANDOC_PDF_ENGINE", "xelatex")
 PANDOC_TIMEOUT_SEC = 180
 
 
@@ -20,7 +22,7 @@ def build_cmd(
     workdir: pathlib.Path,
     meta_override: Optional[dict[str, str]] = None,
 ) -> list[str]:
-    # Resource path: katalog wejścia, workdir i warianty assets
+    # Resource-path dla Pandoca (nie szkodzi, choć grafiki i tak znajdzie TeX)
     rpaths = [
         inp.parent,
         workdir,
@@ -47,7 +49,7 @@ def build_cmd(
     meta_file = RES / "meta.yaml"
     template = RES / "templates" / "eisvogel.tex"
     lua_filter = RES / "filters" / "env.lua"
-    vuln_macros = RES / "templates" / "vuln_macros.tex"  # definiuje \setvulncounts
+
 
     if meta_file.exists():
         cmd += ["--metadata-file", str(meta_file)]
@@ -55,11 +57,7 @@ def build_cmd(
         cmd += ["--template", str(template)]
     if lua_filter.exists():
         cmd += ["--lua-filter", str(lua_filter)]
-    # Dołącz makra do nagłówka (plik bez treści dokumentu)
-    if vuln_macros.exists():
-        cmd += ["--include-in-header", str(vuln_macros)]
 
-    # Dodatkowe metadane runtime
     for k, v in (meta_override or {}).items():
         cmd += ["--metadata", f"{k}={v}"]
 
@@ -89,7 +87,7 @@ def convert_markdown_tree(
     if not inp.is_file():
         raise FileNotFoundError(f"Nie znaleziono pliku Markdown: {md_relpath}")
 
-    # Lokalne zasoby dla renderu
+    # Skopiuj assets do projektu użytkownika (opcjonalnie)
     if ASSETS.exists():
         shutil.copytree(ASSETS, workdir / "assets", dirs_exist_ok=True)
 
@@ -98,12 +96,16 @@ def convert_markdown_tree(
 
     env = os.environ.copy()
     env["TEXMFVAR"] = str(workdir / ".texlive-var")
-    env["TEXINPUTS"] = f"{RES.as_posix()}//:"
+    # Klucz: rekursywne przeszukiwanie całego resources/ i workdir/
+    env["TEXINPUTS"] = f"{RES.as_posix()}//:{workdir.as_posix()}//:"
+    # Trzymaj sandbox; nie używamy ścieżek absolutnych po \input@path/\graphicspath
+    env["openin_any"] = "p"
 
     try:
         subprocess.run(
             cmd,
-            cwd=workdir,
+            # Względne ścieżki obrazów liczone od katalogu pliku .md
+            cwd=inp.parent,
             check=True,
             capture_output=True,
             timeout=PANDOC_TIMEOUT_SEC,

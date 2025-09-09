@@ -4,12 +4,15 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1 \
     REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt \
-    PIP_CERT=/etc/ssl/certs/ca-certificates.crt
+    PIP_CERT=/etc/ssl/certs/ca-certificates.crt \
+    PANDOC_PDF_ENGINE=xelatex
 
-# Python + certy
+# Python + certy + fonty systemowe dla XeLaTeX
 RUN apt-get update && apt-get install -y --no-install-recommends \
       python3 python3-venv python3-pip ca-certificates \
+      fonts-texgyre fonts-dejavu fonts-lmodern fontconfig \
  && update-ca-certificates \
+ && fc-cache -f \
  && rm -rf /var/lib/apt/lists/*
 
 # TeX Live + potrzebne paczki

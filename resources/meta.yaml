@@ -37,9 +37,6 @@ listings-disable-line-numbers: false
 
 from: markdown+raw_tex
 
-filters:
-  - filters/env.lua
-
 header-includes:
   # biblioteki potrzebne filtrom i wykresom
   - '\usepackage{placeins}'
