@@ -2,10 +2,29 @@
 
 local path = require 'pandoc.path'
 
--- maksymalna wysokość obrazka po skalowaniu
+-- === Bezpieczeństwo: helpery ścieżek ===
+local function norm_dir(p)
+  p = path.normalize(p)
+  if p:sub(-1) ~= "/" then p = p .. "/" end
+  return p
+end
+
+local function is_within(base, p)
+  -- true tylko gdy p leży w drzewie base
+  base = norm_dir(base)
+  p = path.normalize(p)
+  return p:sub(1, #base) == base
+end
+
+local function file_exists(p)
+  local f = io.open(p, "rb")
+  if f then f:close(); return true end
+  return false
+end
+
+-- === Konfiguracja filtra ===
 local MAX_H = '0.65\\textheight'
 
--- mapowanie poziomów na ramki
 local M = {
   critical = {open='\\begin{severitybox}[KRYTYCZNY]{Crit}',  close='\\end{severitybox}'},
   high     = {open='\\begin{severitybox}[WYSOKI]{High}',     close='\\end{severitybox}'},
@@ -14,14 +33,6 @@ local M = {
   info     = {open='\\begin{severitybox}[INFORMACYJNY]{Info}', close='\\end{severitybox}'},
 }
 
--- prosty test istnienia pliku
-local function file_exists(p)
-  local f = io.open(p, "rb")
-  if f then f:close(); return true end
-  return false
-end
-
--- escapowanie do LaTeX
 local function latex_escape(s)
   if not s or s == '' then return '' end
   local map = { ['\\']='\\textbackslash{}',['{']='\\{',['}']='\\}',
@@ -30,7 +41,6 @@ local function latex_escape(s)
   return (s:gsub('[\\%%{}#&_^~]', map))
 end
 
--- szerokość obrazka
 local function width_spec(attr)
   if not attr or not attr.attributes then return '\\linewidth' end
   local w = attr.attributes['width']
@@ -39,38 +49,44 @@ local function width_spec(attr)
   return p and (tostring(tonumber(p)/100) .. '\\linewidth') or w
 end
 
--- podpis
 local function caption_text(inlines)
   return latex_escape(pandoc.utils.stringify(inlines or {}))
 end
 
--- przepisanie ścieżki obrazka:
--- 1) spróbuj jak jest, względem katalogu .md (INPUT_DIR)
--- 2) jeśli brak, potraktuj src jako ścieżkę od root projektu (PROJECT_ROOT)
---    i zamień na relatywną do katalogu .md
+-- === Resolucja ścieżek obrazów z blokadą wyjścia poza projekt ===
 local function resolve_image(src)
   if not src or src == '' then return src end
-  if src:match("^%a+://") or src:sub(1,1) == "/" then
-    return src
-  end
+  -- Zostaw URL-e w spokoju; TeX i tak ich nie wczyta jako grafik.
+  if src:match("^%a+://") then return src end
+
   local inputdir = os.getenv("INPUT_DIR") or "."
   local project  = os.getenv("PROJECT_ROOT") or inputdir
+  project = path.normalize(project)
 
+  -- 1) próba względem katalogu .md
   local p1 = path.normalize(path.join({inputdir, src}))
-  if file_exists(p1) then
-    return src
+  if file_exists(p1) and is_within(project, p1) then
+    return path.make_relative(p1, inputdir)
   end
 
-  local p2 = path.normalize(path.join({project, src}))
-  if file_exists(p2) then
+  -- 2) próba „od root projektu”
+  --    Uwaga: blokujemy wszystko spoza PROJECT_ROOT.
+  local p2
+  if src:sub(1,1) == "/" then
+    -- absoluty dozwolone tylko, jeśli wewnątrz projektu
+    p2 = path.normalize(src)
+  else
+    p2 = path.normalize(path.join({project, src}))
+  end
+  if file_exists(p2) and is_within(project, p2) then
     return path.make_relative(p2, inputdir)
   end
 
-  -- brak pliku: zostaw oryginał (pozwoli zobaczyć błąd w logu TeX)
+  -- 3) odrzuć ścieżki poza projektem: zostaw oryginał, TeX wywali błąd
   return src
 end
 
--- generowanie bloku z obrazkiem w ramce
+-- === Render obrazka jako blok z kontrolą rozmiaru ===
 local function blocks_image(img)
   local src    = resolve_image(img.src)
   local width  = width_spec(img.attr)
@@ -95,7 +111,7 @@ local function blocks_image(img)
   return t
 end
 
--- ramki dla sekcji podatności
+-- === Ramki i hooki ===
 function Div(el)
   if not FORMAT:match('latex') then return nil end
   for _, cls in ipairs(el.classes) do
@@ -113,7 +129,6 @@ function Div(el)
   return nil
 end
 
--- zamiana akapitów z pojedynczym obrazkiem na blok z kontrolą rozmiaru
 local function handle_para_like(el)
   if #el.content == 1 and el.content[1].t == 'Image' then
     return blocks_image(el.content[1])
@@ -124,7 +139,7 @@ end
 function Para(el)  return handle_para_like(el) end
 function Plain(el) return handle_para_like(el) end
 
--- pojedyncze obrazy w treści (np. w akapicie z tekstem) – przepisz src
+-- Pojedyncze obrazy w tekście: tylko przepisz src z kontrolą ścieżki
 function Image(el)
   el.src = resolve_image(el.src)
   return el

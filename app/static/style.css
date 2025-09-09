@@ -1,284 +1,126 @@
 :root {
-  --bg: #0b0f14;
-  --bg2: #0a0e12;
-  --surface: #0f141a;
-  --card: #0f141a;
-  --text: #e5e7eb;
-  --muted: #9aa4b2;
-  --border: #1f2a36;
-  --accent: #10b981;
-  --accent-2: #059669;
-  --ring: #22c55e;
+  --bg: #111827;         /* gray-900 */
+  --bg2: #0f172a;        /* slate-900 */
+  --surface: #1f2937;    /* gray-800 */
+  --card: #1f2937;
+  --text: #e5e7eb;       /* gray-200 */
+  --muted: #94a3b8;      /* slate-400 */
+  --border: #374151;     /* gray-700 */
+  --accent: #3b82f6;     /* blue-500 */
+  --accent-2: #2563eb;   /* blue-600 */
+  --ring: #60a5fa;       /* blue-400 */
   --err: #ef4444;
   --warn: #f59e0b;
   --ok: #22c55e;
+  --brand: #3b82f6;
 }
 
-:root {
-  --brand: #0ea5e9;
-}
-
-header .logo {
-  color: var(--brand);
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f8fafc;
-    --bg2: #eef2f7;
-    --surface: #ffffff;
-    --card: #ffffff;
-    --text: #0b1220;
-    --muted: #667085;
-    --border: #e5e7eb;
-    --accent: #0f766e;
-    --accent-2: #0d9488;
-    --ring: #34d399;
-  }
-}
-
-* {
-  box-sizing: border-box
-}
-
-html,
-body {
-  height: 100%
-}
+* { box-sizing: border-box }
+html, body { height: 100% }
 
 body {
   margin: 0;
   font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Ubuntu, Cantarell, "Noto Sans";
   color: var(--text);
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(16, 185, 129, .08), transparent),
+    radial-gradient(1200px 600px at 10% -10%, rgba(59,130,246,.12), transparent),
     linear-gradient(180deg, var(--bg), var(--bg2)) fixed;
 }
 
-.wrap {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 32px 16px
-}
+.wrap { max-width: 900px; margin: 0 auto; padding: 32px 16px }
 
-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin: 12px 0 20px
+header.hero {
+  display: flex; align-items: center; gap: 14px; margin: 12px 0 20px
 }
-
 .logo {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  display: grid;
-  place-items: center;
-  background: conic-gradient(from 200deg, #16a34a, #0ea5e9, #a78bfa, #16a34a);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+  width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center;
+  background: conic-gradient(from 200deg, #2563eb, #3b82f6, #60a5fa, #2563eb);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
 }
-
 .logo:empty::before {
-  content: "";
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  border: 2px solid rgba(255, 255, 255, .75);
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .35);
+  content: ""; width: 22px; height: 22px; border-radius: 6px;
+  border: 2px solid rgba(255,255,255,.75); box-shadow: inset 0 0 0 2px rgba(0,0,0,.35);
 }
-
-header .logo svg {
-  width: 24px;
-  height: 24px;
-  display: block;
-}
-
-h1 {
-  font-size: clamp(22px, 3.5vw, 32px);
-  margin: 0;
-  font-weight: 800
-}
-
-.sub {
-  color: var(--muted);
-  font-size: 14px
-}
+h1 { font-size: clamp(26px, 4vw, 40px); margin: 0; font-weight: 900; color: var(--brand) }
+.sub { color: var(--muted); font-size: 14px }
 
 .card {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 18px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .12);
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
 }
 
-form {
-  display: grid;
-  gap: 16px
-}
-
-label {
-  font-weight: 700
-}
-
-.hint {
-  display: block;
-  color: var(--muted);
-  font-size: 12px;
-  margin-top: 4px
-}
+form { display: grid; gap: 16px }
 
 .drop {
   position: relative;
-  border: 1.5px dashed var(--border);
-  border-radius: 14px;
-  padding: 18px;
-  display: grid;
-  gap: 8px;
+  border: 2px dashed var(--border);
+  border-radius: 18px;
+  padding: 28px;
   text-align: center;
-  transition: border-color .2s, box-shadow .2s;
+  display: grid;
+  gap: 10px;
+  transition: border-color .2s, box-shadow .2s, transform .2s;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 90%, transparent), transparent);
 }
-
-.drop[data-active="1"] {
+.drop.hover,
+.drop:focus-within {
   border-color: var(--ring);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--ring) 30%, transparent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--ring) 30%, transparent);
 }
 
-.drop .row {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  flex-wrap: wrap
+.drop .icon {
+  width: 64px; height: 64px; margin: 0 auto 4px;
+  display: grid; place-items: center;
+  border-radius: 16px;
+  border: 2px solid var(--border);
+  background: radial-gradient(120px 60px at 50% -30%, rgba(255,255,255,.05), transparent);
 }
+.drop .icon svg { width: 34px; height: 34px; fill: var(--text); opacity: .9 }
 
-.drop input[type=file] {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer
-}
+.dz-title { margin: 0; font-size: clamp(18px, 2.5vw, 22px); font-weight: 800 }
+.dz-sub   { margin: 0; color: var(--muted); font-size: 14px }
 
-.controls {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap
-}
+.drop .row { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap }
+.drop input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer }
+
+.controls { display: flex; gap: 12px; flex-wrap: wrap }
 
 button {
-  padding: 10px 16px;
-  border: 0;
-  border-radius: 12px;
-  background: var(--accent);
-  color: #081016;
-  cursor: pointer;
-  font-weight: 800;
+  padding: 10px 16px; border: 0; border-radius: 12px;
+  background: var(--accent); color: #0b1220; cursor: pointer; font-weight: 800;
 }
-
-button.secondary {
-  background: transparent;
-  color: var(--text);
-  border: 1px solid var(--border)
-}
-
-button:disabled {
-  opacity: .65;
-  cursor: not-allowed
-}
+button.primary { background: var(--accent) }
+button.primary:hover { background: var(--accent-2) }
+button.secondary { background: transparent; color: var(--text); border: 1px solid var(--border) }
+button:disabled { opacity: .65; cursor: not-allowed }
 
 .spinner {
-  width: 16px;
-  height: 16px;
-  border: 2px solid rgba(0, 0, 0, .15);
-  border-top-color: #081016;
-  border-radius: 50%;
-  display: inline-block;
-  animation: spin .8s linear infinite;
-  vertical-align: -3px;
+  width: 16px; height: 16px; border: 2px solid rgba(0,0,0,.15); border-top-color: #0b1220;
+  border-radius: 50%; display: inline-block; animation: spin .8s linear infinite; vertical-align: -3px;
 }
+@keyframes spin { to { transform: rotate(360deg) } }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg)
-  }
-}
+.badges { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center }
+.badge { font-size: 12px; padding: 4px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted) }
 
-.badges {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap
-}
+#msg { margin-top: 8px; font-size: 14px; white-space: pre-wrap }
+.ok { color: var(--ok) } .err { color: var(--err) } .warn { color: var(--warn) }
 
-.badge {
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  color: var(--muted);
-}
+summary { cursor: pointer; font-weight: 700 }
+.list { font-size: 13px; color: var(--muted) }
+footer { margin-top: 18px; color: var(--muted); font-size: 12px }
 
-#msg {
-  margin-top: 8px;
-  font-size: 14px;
-  white-space: pre-wrap
-}
+/* accessibility */
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
-.ok {
-  color: var(--ok)
-}
-
-.err {
-  color: var(--err)
-}
-
-.warn {
-  color: var(--warn)
-}
-
-summary {
-  cursor: pointer;
-  font-weight: 700
-}
-
-.list {
-  font-size: 13px;
-  color: var(--muted)
-}
-
-footer {
-  margin-top: 18px;
-  color: var(--muted);
-  font-size: 12px
-}
-
-/* utility */
-.sr-only {
-  position: absolute !important;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.muted {
-  color: var(--muted);
-}
-
-/* focus states */
-button:focus-visible,
-#drop:focus-within {
-  outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 35%, transparent);
-  border-color: var(--ring);
-}
-
-@supports not (box-shadow: 0 0 0 3px color-mix(in srgb, #000 50%, #fff)) {
-
-  button:focus-visible,
-  #drop:focus-within {
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, .35);
+/* prefer light */
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f8fafc; --bg2: #eef2f7; --surface: #ffffff; --card: #ffffff;
+    --text: #0b1220; --muted: #667085; --border: #e5e7eb;
+    --accent: #2563eb; --accent-2: #1d4ed8; --ring: #93c5fd;
   }
 }

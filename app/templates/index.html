@@ -3,44 +3,65 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Pandoc → PDF</title>
+    <title>Pentest Report — narzędzie zespołu cyberbezpieczeństwa</title>
     <meta name="color-scheme" content="dark light">
     <link rel="stylesheet" href="/static/style.css">
     <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   </head>
   <body>
     <div class="wrap">
-      <header>
-        <div class="logo" aria-hidden="true"></div>
+      <header class="hero">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" focusable="false" aria-hidden="true">
+            <path d="M12 2 19 6v6c0 5-3.8 9.4-7 10-3.2-.6-7-5-7-10V6l7-4z"
+                  fill="none" stroke="rgba(255,255,255,.9)" stroke-width="1.8" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <div>
-          <h1>Pandoc → PDF</h1>
-          <div class="sub">Upload tylko katalogu z raportem Markdown.</div>
+          <h1>Pentest Report</h1>
+          <div class="sub">Generator raportów PDF z Markdown (Pandoc)</div>
         </div>
       </header>
+
       <section class="card" aria-labelledby="h-form">
         <h2 id="h-form" class="sr-only">Formularz konwersji</h2>
         <form id="f" novalidate>
-          <label>Wybierz lub przeciągnij katalog (<code>.md</code> + obrazy)</label>
           <div id="drop" class="drop" role="group" aria-label="Przeciągnij katalog lub kliknij, by wybrać">
-            <div class="row">
-              <strong>Przeciągnij i upuść katalog</strong>
-              <span class="muted">lub</span>
-              <button type="button" id="pick" class="secondary">Wybierz katalog</button>
+            <div class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                <path d="M12 3l4 4h-3v6h-2V7H8l4-4z"></path>
+                <path d="M5 14h14v5H5z"></path>
+              </svg>
             </div>
+
+            <h3 class="dz-title">Prześlij katalog projektu</h3>
+            <p class="dz-sub">Wybierz folder z plikami <code>.md</code> i obrazami. Ścieżki względne są wspierane.</p>
+
+            <div class="row">
+              <button type="button" id="pick" class="primary">Wybierz katalog</button>
+              <span class="muted">lub przeciągnij i upuść</span>
+            </div>
+
             <div class="badges" id="stats" aria-live="polite"></div>
             <input id="dir" name="files" type="file" webkitdirectory directory multiple aria-label="Wybierz katalog" />
           </div>
+
           <div class="controls">
             <button id="go" type="submit"><span class="txt">Konwertuj do PDF</span></button>
             <button type="button" id="clear" class="secondary">Wyczyść</button>
           </div>
+
           <div id="msg" role="status" aria-live="polite"></div>
+
           <details id="filesBox" hidden>
             <summary>Wybrane pliki</summary>
             <div class="list" id="fileList"></div>
           </details>
         </form>
-        <footer>Backend oczekuje pola <code>files</code> z zachowanymi ścieżkami.</footer>
+
+        <footer>
+          Wewnętrzne narzędzie CS. Backend oczekuje pola <code>files</code> z zachowanymi ścieżkami.
+        </footer>
       </section>
     </div>
     <script src="/static/main.js"></script>
