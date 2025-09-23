@@ -114,10 +114,10 @@ local function blocks_image(img)
 end
 
 local Boxes = {
-  critical = {open='\\begin{severitybox}[KRYTYCZNY]{Crit}',  close='\\end{severitybox}'},
-  high     = {open='\\begin{severitybox}[WYSOKI]{High}',     close='\\end{severitybox}'},
-  medium   = {open='\\begin{severitybox}[ŚREDNI]{Med}',      close='\\end{severitybox}'},
-  low      = {open='\\begin{severitybox}[NISKI]{Low}',       close='\\end{severitybox}'},
+  critical = {open='\\begin{severitybox}[Poziom zagrożenia: KRYTYCZNY]{Crit}',  close='\\end{severitybox}'},
+  high     = {open='\\begin{severitybox}[Poziom zagrożenia: WYSOKI]{High}',     close='\\end{severitybox}'},
+  medium   = {open='\\begin{severitybox}[Poziom zagrożenia: ŚREDNI]{Med}',      close='\\end{severitybox}'},
+  low      = {open='\\begin{severitybox}[Poziom zagrożenia: NISKI]{Low}',       close='\\end{severitybox}'},
   info     = {open='\\begin{severitybox}[INFORMACYJNY]{Info}', close='\\end{severitybox}'},
 }
 
