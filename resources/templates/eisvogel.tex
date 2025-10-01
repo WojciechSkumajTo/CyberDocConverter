@@ -10,7 +10,7 @@ captions=tableheading
 
 $if(beamerarticle)$\usepackage{beamerarticle}$endif$
 
-% --- okładka i metadane ---
+% --- Pakiety ogólne ---
 \usepackage[table]{xcolor}
 \usepackage{graphicx}
 \usepackage{float}
@@ -19,13 +19,11 @@ $if(beamerarticle)$\usepackage{beamerarticle}$endif$
 \usepackage{pgfplots}
 \usepackage{tikz}
 \usepackage[most]{tcolorbox}
-
-% centrowanie wszystkich figure
 \let\origfigure\figure
 \let\endorigfigure\endfigure
 \renewenvironment{figure}[1][htbp]{\origfigure[#1]\centering}{\endorigfigure}
 
-% Severity boxes
+% tcolorbox – ramki severity
 \tcbset{before skip=8pt, after skip=8pt, sharp corners,
         left=8pt, right=8pt, top=6pt, bottom=6pt}
 \newtcolorbox{severitybox}[2][]{%
@@ -45,7 +43,7 @@ $if(footnotes-pretty)$
 \setlength{\skip\footins}{0.3cm}
 $endif$
 
-% --- marginesy ---
+% --- Marginesy ---
 $if(geometry)$
 \usepackage[$for(geometry)$$geometry$$sep$,$endfor$]{geometry}
 $else$
@@ -53,24 +51,22 @@ $else$
 $endif$
 
 \usepackage{amsmath,amssymb}
-
-% Pandoc \tightlist
 \providecommand{\tightlist}{\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
-% --- listy (enumitem) ---
+% --- Listy ---
 \usepackage{enumitem}
-\setlistdepth{4}
+\setlistdepth={4}
 \renewlist{itemize}{itemize}{4}
 \setlist[itemize]{nosep,topsep=2pt,parsep=0pt,itemsep=2pt,align=parleft,leftmargin=*,labelsep=0.65em,label=\textbullet}
 
-% --- numeracja sekcji ---
+% --- Numeracja sekcji ---
 $if(numbersections)$
 \setcounter{secnumdepth}{$if(secnumdepth)$$secnumdepth$$else$5$endif$}
 $else$
 \setcounter{secnumdepth}{-\maxdimen}
 $endif$
 
-% --- wspólne ustawienia pandoca ---
+% --- Wspólne ustawienia pandoca ---
 $fonts.latex()$
 $font-settings.latex()$
 $common.latex()$
@@ -81,7 +77,7 @@ $hypersetup.latex()$
 % przypisy wstecz
 $if(footnotes-disable-backlinks)$$else$\usepackage{footnotebackref}$endif$
 
-% --- czcionki i łamanie ---
+% --- Czcionki i łamanie ---
 \usepackage{fontspec}
 \setmainfont{TeX Gyre Heros}
 \setsansfont{TeX Gyre Heros}
@@ -89,7 +85,11 @@ $if(footnotes-disable-backlinks)$$else$\usepackage{footnotebackref}$endif$
 \usepackage{microtype}
 \clubpenalty=10000 \widowpenalty=10000 \displaywidowpenalty=10000
 
-% --- tytuł/autor/data ---
+% --- Zawijanie zwykłych akapitów (URL/tokeny) ---
+\sloppy
+\setlength{\emergencystretch}{12em}
+
+% --- Tytuł/autor/data ---
 \usepackage{titling}
 \title{$title$}
 $if(subtitle)$
@@ -102,7 +102,7 @@ $endif$
 \author{$for(author)$$author$$sep$, $endfor$}
 \date{$date$}
 
-% --- panel metadanych na okładce ---
+% --- Panel metadanych na okładce ---
 \definecolor{TitleText}{HTML}{$if(titlepage-text-color)$$titlepage-text-color$$else$FFFFFF$endif$}
 \definecolor{Accent}{HTML}{$if(titlepage-rule-color)$$titlepage-rule-color$$else$4353B3$endif$}
 \tcbset{
@@ -120,11 +120,12 @@ $endif$
 $if(page-background)$\usepackage[pages=all]{background}$endif$
 $if(titlepage)$\usepackage{pagecolor}\usepackage{afterpage}$endif$
 
-% linki i URL
+% Linki i URL
 \PassOptionsToPackage{hyphens}{url}
+\usepackage{xurl}
 \urlstyle{same}
 
-% cytowania i podpisy
+% Cytowania i podpisy
 \usepackage{csquotes}
 \definecolor{caption-color}{HTML}{777777}
 \usepackage[font={stretch=1.2},
@@ -135,18 +136,18 @@ $if(titlepage)$\usepackage{pagecolor}\usepackage{afterpage}$endif$
 \setcapindent{0em}
 \captionsetup[figure]{justification=centering}
 
-% blockquote
+% Blockquote
 \definecolor{blockquote-border}{RGB}{221,221,221}
 \definecolor{blockquote-text}{RGB}{119,119,119}
 \usepackage{mdframed}
 \newmdenv[rightline=false,bottomline=false,topline=false,linewidth=3pt,linecolor=blockquote-border,skipabove=\parskip]{customblockquote}
 \renewenvironment{quote}{\begin{customblockquote}\list{}{\rightmargin=0em\leftmargin=0em}\item\relax\color{blockquote-text}\ignorespaces}{\unskip\unskip\endlist\end{customblockquote}}
 
-% nagłówki
+% Nagłówki
 \definecolor{heading-color}{RGB}{40,40,40}
 \addtokomafont{disposition}{\normalfont\color{heading-color}\bfseries\sffamily}
 
-% tabele
+% Tabele
 $if(tables)$
 \definecolor{table-row-color}{HTML}{F5F5F5}
 \definecolor{table-rule-color}{HTML}{999999}
@@ -164,90 +165,64 @@ $if(table-use-row-colors)$
 $endif$
 $endif$
 
-% akapity
+% Akapity
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{6pt plus 2pt minus 1pt}
-\setlength{\emergencystretch}{3em}
 
-% Listings
-$if(listings)$
-\usepackage{listings}
+% === BLOKI KODU: minted + tcolorbox (stabilne zawijanie) ===
 \definecolor{listing-background}{HTML}{F7F7F7}
-\definecolor{listing-rule}{HTML}{B3B2B3}
-\definecolor{listing-numbers}{HTML}{B3B2B3}
-\definecolor{listing-text-color}{HTML}{000000}
-\definecolor{listing-keyword}{HTML}{435489}
-\definecolor{listing-keyword-2}{HTML}{1284CA}
-\definecolor{listing-keyword-3}{HTML}{9137CB}
-\definecolor{listing-identifier}{HTML}{435489}
-\definecolor{listing-string}{HTML}{00999A}
-\definecolor{listing-comment}{HTML}{8E8E8E}
+\definecolor{listing-rule}{HTML}{BABABA}
+\definecolor{listing-numbers}{HTML}{9AA0A6}
+\usepackage{fvextra}
 
-\lstdefinestyle{eisvogel_listing_style}{
-$if(listings-disable-line-numbers)$
-  xleftmargin=0.6em, framexleftmargin=0.4em,
-$else$
-  numbers=left, xleftmargin=2.7em, framexleftmargin=2.5em,
-$endif$
-  backgroundcolor=\color{listing-background},
-  basicstyle=\color{listing-text-color}\linespread{1.0}\lst@ifdisplaystyle$if(code-block-font-size)$$code-block-font-size$$else$\footnotesize$endif$\fi\ttfamily{},
-  breaklines=true, frame=single, framesep=0.19em,
-  rulecolor=\color{listing-rule}, frameround=ffff,
-  tabsize=2, numberstyle=\footnotesize\color{listing-numbers},
-  aboveskip=1.0em, belowskip=0.1em, breakindent=0pt,
-  abovecaptionskip=0em, belowcaptionskip=1.0em,
-  keywordstyle={\color{listing-keyword}\bfseries},
-  keywordstyle={[2]\color{listing-keyword-2}\bfseries},
-  keywordstyle={[3]\color{listing-keyword-3}\bfseries\itshape},
-  sensitive=true, identifierstyle=\color{listing-identifier},
-  commentstyle=\color{listing-comment}, stringstyle=\color{listing-string},
-  showstringspaces=false, escapeinside={/*@}{@*/},
-  literate=
-  {á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1
-  {Á}{{\'A}}1 {É}{{\'E}}1 {Í}{{\'I}}1 {Ó}{{\'O}}1 {Ú}{{\'U}}1
-  {à}{{\`a}}1 {è}{{\`e}}1 {ì}{{\`i}}1 {ò}{{\`o}}1 {ù}{{\`u}}1
-  {À}{{\`A}}1 {È}{{\`E}}1 {Ì}{{\`I}}1 {Ò}{{\`O}}1 {Ù}{{\`U}}1
-  {ä}{{\"a}}1 {ë}{{\"e}}1 {ï}{{\"i}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
-  {Ä}{{\"A}}1 {Ë}{{\"E}}1 {Ï}{{\"I}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
-  {â}{{\^a}}1 {ê}{{\^e}}1 {î}{{\^i}}1 {ô}{{\^o}}1 {û}{{\^u}}1
-  {Â}{{\^A}}1 {Ê}{{\^E}}1 {Î}{{\^I}}1 {Ô}{{\^O}}1 {Û}{{\^U}}1
-  {œ}{{\oe}}1 {Œ}{{\OE}}1 {æ}{{\ae}}1 {Æ}{{\AE}}1 {ß}{{\ss}}1
-  {ą}{{\k a}}1 {Ą}{{\k A}}1 {ę}{{\k e}}1 {Ę}{{\k E}}1
-  {ś}{{\'s}}1 {Ś}{{\'S}}1 {ć}{{\'c}}1 {Ć}{{\'C}}1
-  {ź}{{\'z}}1 {Ź}{{\'Z}}1 {ż}{{\.z}}1 {Ż}{{\.Z}}1
-  {ł}{{\l}}1  {Ł}{{\L}}1  {ń}{{\'n}}1 {Ń}{{\'N}}1
-  {ç}{{\c c}}1 {Ç}{{\c C}}1 {ø}{{\o}}1 {å}{{\r a}}1 {Å}{{\r A}}1
-  {€}{{\EUR}}1 {£}{{\pounds}}1 {«}{{\guillemotleft}}1
-  {»}{{\guillemotright}}1 {ñ}{{\~n}}1 {Ñ}{{\~N}}1 {¿}{{?`}}1
-  {…}{{\ldots}}1 {≥}{{>=}}1 {≤}{{<=}}1 {„}{{\glqq}}1 {“}{{\grqq}}1
-  {”}{{''}}1
-}
-\lstset{style=eisvogel_listing_style,columns=fullflexible,keepspaces=true}
+\makeatletter
+\renewcommand{\theFancyVerbLine}{\textcolor{listing-numbers}{\ttfamily\scriptsize\arabic{FancyVerbLine}}}
+\@ifundefined{Shaded}{\newenvironment{Shaded}{}{} }{}
+\@ifundefined{Highlighting}{\DefineVerbatimEnvironment{Highlighting}{Verbatim}{}}{}
+\@ifundefined{VerbBar}{}{\let\VerbBar\relax}
+\@ifundefined{VERB}{}{\let\VERB\relax}
+\makeatother
 
-\lstdefinelanguage{Java}{morekeywords={abstract,assert,break,case,catch,class,continue,default,
-  do,else,enum,exports,extends,final,finally,for,if,implements, import,instanceof,interface,module,native,new,package,private,
-  protected,public,requires,return,static,strictfp,super,switch, synchronized,this,throw,throws,transient,try,volatile,while,var},
-  morekeywords={[2]boolean,byte,char,double,float,int,long,short, String,Boolean,Byte,Character,Double,Float,Integer,Long,Short,
-  Number,AtomicInteger,AtomicLong,BigDecimal,BigInteger,DoubleAccumulator,DoubleAdder,LongAccumulator,LongAdder,Short,
-  Object,Void,void},
-  morekeywords={[3]null,true,false},
-  sensitive, morecomment=[l]//, morecomment=[s]{/*}{*/}, morecomment=[s]{/**}{*/},
-  morestring=[b]", morestring=[b]'
+\fvset{
+  breaklines=true, breakanywhere=true, breaknonspaceingroup=true,
+  breakautoindent=false, breakindent=0pt,
+  numbers=left, numbersep=9pt, xleftmargin=2.8em,
+  obeytabs=true, tabsize=2, breaksymbolleft={}, breaksymbolright={}
 }
 
-\lstdefinelanguage{XML}{
-  morestring=[b]", moredelim=[s][\bfseries\color{listing-keyword}]{<}{\ },
-  moredelim=[s][\bfseries\color{listing-keyword}]{</}{>},
-  moredelim=[l][\bfseries\color{listing-keyword}]{/>},
-  moredelim=[l][\bfseries\color{listing-keyword}]{>},
-  morecomment=[s]{<?}{?>}, morecomment=[s]{<!--}{-->},
-  commentstyle=\color{listing-comment}, stringstyle=\color{listing-string},
-  identifierstyle=\color{listing-identifier}
-}
-\lstdefinelanguage{HTML}{language=XML}
-$endif$
+\renewenvironment{Shaded}{%
+  \begin{tcolorbox}[enhanced,breakable,sharp corners,
+    colback=listing-background, colframe=listing-rule,
+    boxrule=0.5pt, width=\linewidth,
+    left=3mm,right=3mm,top=1.2mm,bottom=1.2mm]%
+}{\end{tcolorbox}}
 
-% --- nagłówek/stopka ---
+\usepackage{minted} % wymaga -shell-escape
+\setminted{
+  fontsize=\small, baselinestretch=1.02,
+  linenos, numbersep=9pt, xleftmargin=2.8em,
+  frame=none, framerule=0pt, framesep=0pt,
+  breaklines=true, breakanywhere=true,
+  breakautoindent=false, breakindent=0pt,
+  obeytabs=true, tabsize=2,
+  style=$if(minted-style)$$minted-style$$else$friendly$endif$,
+  autogobble, stripnl=true
+}
+\tcolorboxenvironment{minted}{
+  enhanced,breakable,sharp corners,
+  colback=listing-background, colframe=listing-rule,
+  boxrule=0.5pt, width=\linewidth,
+  left=3mm, right=3mm, top=1.2mm, bottom=1.2mm
+}
+\tcolorboxenvironment{minted*}{
+  enhanced,breakable,sharp corners,
+  colback=listing-background, colframe=listing-rule,
+  boxrule=0.5pt, width=\linewidth,
+  left=3mm, right=3mm, top=1.2mm, bottom=1.2mm
+}
+% === /BLOKI KODU ===
+
+% --- Nagłówek/stopka ---
 $if(disable-header-and-footer)$
 $else$
 \usepackage[headsepline,footsepline]{scrlayer-scrpage}
@@ -263,7 +238,7 @@ $else$
   \cfoot*{$if(footer-center)$$footer-center$$else$$endif$}
   \ofoot*{$if(footer-right)$$footer-right$$else$\thepage$endif$}
   \setkomafont{pageheadfoot}{\scriptsize\upshape}
-}
+} % <-- brakująca klamra
 \pagestyle{eisvogel-header-footer}
 $if(book)$
 \deftripstyle{ChapterStyle}{}{}{}{}{\pagemark}{}
@@ -277,7 +252,7 @@ $if(page-background)$
 $endif$
 $endif$
 
-% watermark
+% Watermark
 $if(watermark)$\usepackage{draftwatermark}\SetWatermarkText{$watermark$}\SetWatermarkScale{.5}$endif$
 
 \begin{document}
@@ -298,19 +273,16 @@ $if(titlepage-background)$
 {\includegraphics[width=\paperwidth,height=\paperheight,keepaspectratio]{$titlepage-background$}};
 $endif$
 
-% górna linia
 \noindent\color[HTML]{$if(titlepage-text-color)$$titlepage-text-color$$else$333333$endif$}
 \makebox[0pt][l]{\colorRule[$if(titlepage-rule-color)$$titlepage-rule-color$$else$4353B3$endif$]{\paperwidth}{$if(titlepage-rule-height)$$titlepage-rule-height$$else$3$endif$pt}}
 \vspace*{3.2em}
 
-% tytuł / podtytuł
 \begin{center}
 {\huge \bfseries \sffamily $title$ \par}
 $if(subtitle)$\vspace{0.6em}{\Large \sffamily $subtitle$ \par}$endif$
 $if(titlepage-background)$$else$\vspace{0.4em}{\normalsize \sffamily $date$ \par}$endif$
 \end{center}
 
-% panel danych
 \vspace{1.6em}
 \begin{tcolorbox}[securityblock]
 \setstretch{1.2}
@@ -326,7 +298,6 @@ $if(titlepage-background)$$else$\vspace{0.4em}{\normalsize \sffamily $date$ \par
 \end{tabularx}
 \end{tcolorbox}
 
-% logo
 $if(titlepage-logo)$
 \tikz[remember picture,overlay]
 \node[anchor=north east,inner sep=0pt,xshift=-2.8cm,yshift=-2.4cm]
